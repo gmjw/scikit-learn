@@ -137,7 +137,8 @@ class _GeneralizedLinearRegressor(RegressorMixin, BaseEstimator):
     # make them public in the docstrings. This facilitates testing and
     # benchmarking.
     _parameter_constraints: dict = {
-        "alpha": [Interval(Real, 0.0, None, closed="left")],
+        # Commenting this out so we can use arrays for `alpha`.
+        # "alpha": [Interval(Real, 0.0, None, closed="left")],
         "fit_intercept": ["boolean"],
         "solver": [
             StrOptions({"lbfgs", "newton-cholesky"}),
