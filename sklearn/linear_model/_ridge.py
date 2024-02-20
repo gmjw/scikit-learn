@@ -204,7 +204,9 @@ def _solve_cholesky(X, y, alpha):
         return linalg.solve(A, Xy, assume_a="pos", overwrite_a=True).T
     else:
         coefs = np.empty([n_targets, n_features], dtype=X.dtype)
-        for coef, target, current_alpha in zip(coefs, Xy.T, alpha):
+
+        # Adjusting this line to allow for per-feature regularisation.
+        for coef, target, current_alpha in zip(coefs, Xy.T, alpha.reshape(1, -1)):
             A.flat[:: n_features + 1] += current_alpha
             coef[:] = linalg.solve(A, target, assume_a="pos", overwrite_a=False).ravel()
             A.flat[:: n_features + 1] -= current_alpha
@@ -672,11 +674,16 @@ def _ridge_regression(
 
     # There should be either 1 or n_targets penalties
     alpha = np.asarray(alpha, dtype=X.dtype).ravel()
-    if alpha.size not in [1, n_targets]:
-        raise ValueError(
-            "Number of targets and number of penalties do not correspond: %d != %d"
-            % (alpha.size, n_targets)
-        )
+
+    # Commenting this out to allow for per-feature regularisation.
+    # Original sklearn code assume array alphas are designed for
+    # multiple `y` values, it's much more useful to have different
+    # alphas per feature!
+    # if alpha.size not in [1, n_targets]:
+    #     raise ValueError(
+    #         "Number of targets and number of penalties do not correspond: %d != %d"
+    #         % (alpha.size, n_targets)
+    #     )
 
     if alpha.size == 1 and n_targets > 1:
         alpha = np.repeat(alpha, n_targets)
